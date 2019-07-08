@@ -262,10 +262,12 @@
 #  define CLEANUP_AFTER_C_CALL addq $32, %rsp; CFI_ADJUST(-32)
    /* Stack probing mustn't be larger than the page size */
 #  define STACK_PROBE_SIZE $4096
+#  define STACK_PROBE_SIZE_ 4096
 #else
 #  define PREPARE_FOR_C_CALL
 #  define CLEANUP_AFTER_C_CALL
 #  define STACK_PROBE_SIZE $32768
+#  define STACK_PROBE_SIZE_ 32768
 #endif
 
 /* Registers holding arguments of C functions. */
@@ -297,9 +299,9 @@ FUNCTION(G(caml_call_gc))
 LBL(caml_call_gc):
     /* Touch the stack to trigger a recoverable segfault
        if insufficient space remains */
-        subq    STACK_PROBE_SIZE, %rsp
+        subq    STACK_PROBE_SIZE, %rsp; CFI_ADJUST(STACK_PROBE_SIZE_)
         movq    %rax, 0(%rsp)
-        addq    STACK_PROBE_SIZE, %rsp
+        addq    STACK_PROBE_SIZE, %rsp; CFI_ADJUST(-STACK_PROBE_SIZE_)
     /* Build array of registers, save it into caml_gc_regs */
 #ifdef WITH_FRAME_POINTERS
         ENTER_FUNCTION          ;
@@ -484,9 +486,9 @@ LBL(caml_c_call):
         subq    $8, %rsp; CFI_ADJUST(8) /* equivalent to pushq %r12 */
     /* Touch the stack to trigger a recoverable segfault
        if insufficient space remains */
-        subq    STACK_PROBE_SIZE, %rsp
+        subq    STACK_PROBE_SIZE, %rsp ; CFI_ADJUST(STACK_PROBE_SIZE_)
         movq    %rax, 0(%rsp)
-        addq    STACK_PROBE_SIZE, %rsp
+        addq    STACK_PROBE_SIZE, %rsp ; CFI_ADJUST(-STACK_PROBE_SIZE_)
     /* Make the exception handler and alloc ptr available to the C code */
         STORE_VAR(%r15, caml_young_ptr)
         STORE_VAR(%r14, caml_exception_pointer)
