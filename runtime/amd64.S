@@ -536,10 +536,15 @@ FUNCTION(G(caml_c_call))
 CFI_STARTPROC
 LBL(caml_c_call):
     /* Record lowest stack address and return address */
-        popq    Caml_state(last_return_address); CFI_ADJUST(-8)
-        movq    %rsp, Caml_state(bottom_of_stack)
+    /*    popq    Caml_state(last_return_address); CFI_ADJUST(-8)
+        movq    %rsp, Caml_state(bottom_of_stack)*/
     /* equivalent to pushing last return address */
-        subq    $8, %rsp; CFI_ADJUST(8)
+    /*    subq0    $8, %rsp; CFI_ADJUST(8) */
+    /* Record lowest stack address and return address */
+        movq    (%rsp),%r12
+        movq    %r12, Caml_state(last_return_address)
+        leaq    0x8(%rsp),%r12
+        movq    %r12, Caml_state(bottom_of_stack)
 #ifdef WITH_SPACETIME
     /* Record the trie node hole pointer that corresponds to
        [Caml_state->last_return_address] */
