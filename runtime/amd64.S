@@ -529,15 +529,15 @@ FUNCTION(G(caml_c_call))
 CFI_STARTPROC
 LBL(caml_c_call):
     /* Record lowest stack address and return address */
-        popq    %r12; CFI_ADJUST(-8)
+        movq    (%rsp), %r12
         STORE_VAR(%r12, caml_last_return_address)
-        STORE_VAR(%rsp, caml_bottom_of_stack)
+        leaq    0x8(%rsp), %r12
+        STORE_VAR(%r12, caml_bottom_of_stack)
 #ifdef WITH_SPACETIME
     /* Record the trie node hole pointer that corresponds to
        [caml_last_return_address] */
         STORE_VAR(%r13, caml_spacetime_trie_node_ptr)
 #endif
-        subq    $8, %rsp; CFI_ADJUST(8) /* equivalent to pushq %r12 */
     /* Touch the stack to trigger a recoverable segfault
        if insufficient space remains */
         subq    $(STACK_PROBE_SIZE), %rsp; CFI_ADJUST(STACK_PROBE_SIZE);
