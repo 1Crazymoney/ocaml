@@ -316,6 +316,18 @@ val equal: t -> t -> bool
 (** The equal function for strings.
     @since 4.03.0 *)
 
+val hash : t -> int
+(** The hash function for strings, with the same specification as
+    {!Hashtbl.hash}. Along with the type [t], this function [hash]
+    allows the module [String] to be passed as argument to the functor
+    {!HashTbl.Make}.
+    @since 4.10.0 *)
+
+val seeded_hash : int -> t -> int
+(** A seeded hash function for strings, with the same specification as
+    {!Hashtbl.seeded_hash}.
+    @since 4.10.0 *)
+
 val split_on_char: char -> string -> string list
 (** [String.split_on_char sep s] returns the list of all (possibly empty)
     substrings of [s] that are delimited by the [sep] character.
