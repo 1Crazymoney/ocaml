@@ -316,16 +316,15 @@ val equal: t -> t -> bool
 (** The equal function for strings.
     @since 4.03.0 *)
 
-val hash : t -> int
-(** The hash function for strings, with the same specification as
-    {!Hashtbl.hash}. Along with the type [t], this function [hash]
-    allows the module [String] to be passed as argument to the functor
-    {!HashTbl.Make}.
+val unseeded_hash : t -> int
+(** An unseeded hash function for strings, with the same output value as
+    {!Hashtbl.hash}.
     @since 4.10.0 *)
 
-val seeded_hash : int -> t -> int
-(** A seeded hash function for strings, with the same specification as
-    {!Hashtbl.seeded_hash}.
+val hash : int -> t -> int
+(** A seeded hash function for strings, with the same output value as
+    {!Hashtbl.seeded_hash}. This function allows the module [String]
+    to be passed as argument to the functor {!Hashtbl.MakeSeeded}.
     @since 4.10.0 *)
 
 val split_on_char: char -> string -> string list
