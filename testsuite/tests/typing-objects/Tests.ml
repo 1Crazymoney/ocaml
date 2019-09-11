@@ -728,7 +728,7 @@ val x : '_weak2 list ref = {contents = []}
 module F(X : sig end) =
   struct type t = int let _ = (x : < m : t> list ref) end;;
 [%%expect{|
-module F : functor (X : sig  end) -> sig type t = int end
+module F : functor (X : sig end) -> sig type t = int end
 |}];;
 x;;
 [%%expect{|
@@ -915,4 +915,33 @@ Line 2, characters 8-52:
 2 | and b = let x() = new a in let y = x() in object end;;
             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Error: This kind of recursive class expression is not allowed
+|}];;
+
+class a = object val x = 3 val y = x + 2 end;;
+[%%expect{|
+Line 1, characters 35-36:
+1 | class a = object val x = 3 val y = x + 2 end;;
+                                       ^
+Error: The instance variable x
+       cannot be accessed from the definition of another instance variable
+|}];;
+
+class a = object (self) val x = self#m method m = 3 end;;
+[%%expect{|
+Line 1, characters 32-36:
+1 | class a = object (self) val x = self#m method m = 3 end;;
+                                    ^^^^
+Error: The self variable self
+       cannot be accessed from the definition of an instance variable
+|}];;
+
+class a = object method m = 3 end
+class b = object inherit a as super val x = super#m end;;
+[%%expect{|
+class a : object method m : int end
+Line 2, characters 44-49:
+2 | class b = object inherit a as super val x = super#m end;;
+                                                ^^^^^
+Error: The ancestor variable super
+       cannot be accessed from the definition of an instance variable
 |}];;

@@ -8,7 +8,20 @@ Working version
 - #7557, #1726: multi-indices for extended indexing operators
   (Florian Angeletti, review by Gabriel Radanne)
 
+* #1859: --enable-force-safe-string is now the default. This can be
+  overridden at configure time only (introduced by 4.04 in 2016).
+  Unless --disable-force-safe-string is used at configure time, this
+  breaks code that use the '-unsafe-string' argument and C stubs that
+  use String_val as a char* instead of const char*
+  (Kate Deplaix)
+
+
 ### Internal/compiler-libs changes:
+
+- #8844: Printing faulty constructors, inline records fields and their types
+  during type mismatches. Also slightly changed other type mismatches error
+  output.
+  (Mekhrubon Turaev, review by Florian Angeletti, Leo White)
 
 - #8828: Added abstractions for variants, records, constructors, fields and
   extension constructor types mismatch.
@@ -18,6 +31,10 @@ Working version
   (Ulugbek Abdullaev, review by David Allsopp and Gabriel Scherer)
 
 - #1901: Fix lexing of character literals in comments
+  (Pieter Goetschalckx, review by Damien Doligez)
+
+- #1932: Allow octal escape sequences and identifiers containing apostrophes
+  in ocamlyacc actions and comments.
   (Pieter Goetschalckx, review by Damien Doligez)
 
 - #2288: Move middle end code from [Asmgen] to [Clambda_middle_end] and
@@ -40,6 +57,15 @@ Working version
 - #7924: Use a variant instead of an int in Bad_variance exception
   (Rian Douglas, review by Gabriel Scherer)
 
+- #8890: in -dtimings output, show time spent in C linker clearly
+  (Valentin Gatien-Baron)
+
+- #8910, #8911: minor improvements to the printing of module types
+  (Gabriel Scherer, review by Florian Angeletti)
+
+- #8913: ocamltest: improve 'promote' implementation to take
+  skipped lines/bytes into account
+  (Gabriel Scherer, review by Sébastien Hinderer)
 
 ### Code generation and optimizations:
 
@@ -60,6 +86,9 @@ Working version
 - #2321: Eliminate dead ICatch handlers
   (Greta Yorsh, review by Pierre Chambart and Vincent Laviron)
 
+- #8919: lift mutable lets along with immutable ones
+  (Leo White, review by Pierre Chambart)
+
 ### Runtime system:
 
 - #8619: Ensure Gc.minor_words remains accurate after a GC.
@@ -70,13 +99,19 @@ Working version
    OCaml heap.
    (Jacques-Henri Jourdan, review by Damien Doligez)
 
-- #8691: Allocation functions are now guaranteed not to trigger any
+- #8691, #8897: Allocation functions are now guaranteed not to trigger any
    OCaml callback when called from C.
    (Jacques-Henri Jourdan, review by Stephen Dolan and Gabriel Scherer)
 
 - #8630: Use abort() instead of exit(2) in caml_fatal_error, and add
   the new hook caml_fatal_error_hook.
   (Jacques-Henri Jourdan, review by Xavier Leroy)
+
+- #8713: Introduce a state table in the runtime to contain the global variables
+   which must be duplicated for each domain in the multicore runtime.
+   (KC Sivaramakrishnan and Stephen Dolan, compatibility header hacking by
+    David Allsopp, review by David Allsopp, Alain Frisch, Nicolas Ojeda Bar,
+    Gabriel Scherer and Damien Doligez)
 
 ### Tools:
 
@@ -93,9 +128,8 @@ Working version
 
 - #8634: Statistical memory profiling provided by the Gc.Memprof
    module.
-   Incomplete version: does not sample
-     - objects allocated in the minor heap in native mode,
-     - objects allocated by de-marshalling.
+   Incomplete version: does not sample objects allocated in the minor
+   heap in native mode
    (Jacques-Henri Jourdan, review by Stephen Dolan, Gabriel Scherer and
     Damien Doligez)
 
@@ -117,8 +151,19 @@ Working version
 
 ### Compiler user-interface and warnings:
 
-    #8833: Hint for (type) redefinitions in toplevel session
-    (Florian Angeletti, review by Gabriel Scherer)
+- #8833: Hint for (type) redefinitions in toplevel session
+  (Florian Angeletti, review by Gabriel Scherer)
+
+- #2127: Refactor lookup functions
+  Included observable changes:
+    - makes the location of usage warnings and alerts for constructors more
+      precise
+    - don't warn about a constructor never being used to build values when it
+      has been defined as private
+  (Leo White, review by Thomas Refis)
+
+- #8885: Warn about unused local modules
+  (Thomas Refis, review by Alain Frisch)
 
 ### Build system:
 
@@ -131,6 +176,11 @@ Working version
   (Stephen Dolan, review by Gabriel Scherer, Sébastien Hinderer and
    Thomas Refis)
 
+- #8837: build manpages using ocamldoc.opt when available
+  cuts the manpages build time from 14s to 4s
+  (Gabriel Scherer, review by David Allsopp and Sébastien Hinderer,
+   report by David Allsopp)
+
 - #8843, #8841: fix use of off_t on 32-bit systems.
   (Stephen Dolan, report by Richard Jones, review by Xavier Leroy)
 
@@ -138,6 +188,13 @@ Working version
 
 - #8702, #8777: improved error messages for fixed row polymorphic variants
   (Florian Angeletti, report by Leo White, review by Thomas Refis)
+
+- #8874: add tests for typechecking error messages and pack them into
+  pretty-printing boxes.
+  (Oxana Kostikova, review by Gabriel Scherer)
+
+- #8914: clarify the warning on unboxable types used in external primitives (61)
+  (Gabriel Scherer, review by Florian Angeletti, report on the Discourse forum)
 
 ### Bug fixes:
 
@@ -148,6 +205,9 @@ Working version
   and misleading function CamlinternalFormat.string_of_formatting_gen
   (Gabriel Scherer and Florian Angeletti,
    review by Florian Angeletti and Gabriel Radanne)
+
+- #8875: fix missing newlines in the output from MSVC invocation.
+  (Nicolás Ojeda Bär, review by Gabriel Scherer)
 
 OCaml 4.09.0
 ------------
@@ -407,6 +467,9 @@ OCaml 4.09.0
 
 - #8864, #8865: Fix native compilation of left shift by (word_size - 1)
   (Vincent Laviron, report by Murilo Giacometti Rocha, review by Xavier Leroy)
+
+- #8862, #8871: subst: preserve scopes
+  (Thomas Refis, report by Leo White)
 
 OCaml 4.08 maintenance branch:
 ------------------------------

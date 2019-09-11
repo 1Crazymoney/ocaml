@@ -166,7 +166,7 @@ clean::
 OCAMLMKTOP=ocamlmktop.cmo
 OCAMLMKTOP_IMPORTS=config.cmo build_path_prefix_map.cmo misc.cmo \
        identifiable.cmo numbers.cmo arg_helper.cmo clflags.cmo \
-       load_path.cmo ccomp.cmo
+       load_path.cmo profile.cmo ccomp.cmo
 
 $(call byte_and_opt,ocamlmktop,$(OCAMLMKTOP_IMPORTS) $(OCAMLMKTOP),)
 
@@ -267,9 +267,13 @@ else
 DEF_SYMBOL_PREFIX = '-Dsymbol_prefix=""'
 endif
 
-objinfo_helper$(EXE): objinfo_helper.c $(ROOTDIR)/runtime/caml/s.h
-	$(CC) $(OC_CFLAGS) $(OC_CPPFLAGS) -I$(ROOTDIR)/runtime $(OUTPUTEXE)$@ \
-          $(DEF_SYMBOL_PREFIX) $(LIBBFD_INCLUDE) $< $(LIBBFD_LINK)
+objinfo_helper$(EXE): objinfo_helper.$(O)
+	$(CC) $(OC_CFLAGS) $(OUTPUTEXE)$@ $< $(LIBBFD_LINK)
+
+objinfo_helper.$(O): $(ROOTDIR)/runtime/caml/s.h
+
+objinfo_helper.$(O): \
+  OC_CPPFLAGS += -I$(ROOTDIR)/runtime $(DEF_SYMBOL_PREFIX) $(LIBBFD_INCLUDE)
 
 OBJINFO=$(ROOTDIR)/compilerlibs/ocamlcommon.cma \
         $(ROOTDIR)/compilerlibs/ocamlbytecomp.cma \

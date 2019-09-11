@@ -18,7 +18,7 @@
 open Format
 open Mach
 open Printmach
-open Linearize
+open Linear
 
 let label ppf l =
   Format.fprintf ppf "L%i" l
@@ -68,7 +68,7 @@ let instr ppf i =
   | Lpoptrap ->
       fprintf ppf "pop trap"
   | Lraise k ->
-      fprintf ppf "%a %a" Printcmm.raise_kind k reg i.arg.(0)
+      fprintf ppf "%s %a" (Lambda.raise_kind k) reg i.arg.(0)
   end;
   if not (Debuginfo.is_none i.dbg) then
     fprintf ppf " %s" (Debuginfo.to_string i.dbg)
