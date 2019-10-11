@@ -737,6 +737,12 @@ let emit_instr fallthrough i =
       let lbl = bound_error_label ?label:label_after_error i.dbg ~spacetime in
       I.cmp (int n) (arg i 0);
       I.jbe (label lbl)
+  | Lop(Iintop Ixor) when i.arg.(1).loc = i.res.(0).loc ->
+      (* use 32bit xor when xoring a register with itself as more compact *)
+      begin match i.res.(0).loc with
+        | Reg _ -> I.xor (res32 i 0) (res32 i 0)
+        | _     -> I.xor (arg i 1) (res i 0)
+      end
   | Lop(Iintop(Idiv | Imod)) ->
       I.cqo ();
       I.idiv (arg i 1)
@@ -754,6 +760,13 @@ let emit_instr fallthrough i =
       I.inc (res i 0)
   | Lop(Iintop_imm(Iadd, -1) | Iintop_imm(Isub, 1)) ->
       I.dec (res i 0)
+  | Lop(Iintop_imm(Iand, n)) when n >= 0 && n <= 0xFFFF_FFFF ->
+      (* The imm is 32bits, so the top bits in a 64bit register will be zero
+         Therefore use (compact) 32bit version which will clear top bits *)
+      begin match i.res.(0).loc with
+        | Reg _ -> I.and_ (int n) (res32 i 0)
+        | _     -> I.and_ (int n) (res i 0)
+      end
   | Lop(Iintop_imm(op, n)) ->
       (* We have i.arg.(0) = i.res.(0) *)
       instr_for_intop op (int n) (res i 0)
